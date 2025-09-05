@@ -5,8 +5,10 @@ import MealDetails from "../components/MealDetails";
 import Subtitle from "../components/MealDetail/Subtitle";
 import List from "../components/MealDetail/List";
 import IconButton from "../components/IconButton";
+import RatingStars from "../components/RatingStars";
 import { useDispatch, useSelector } from "react-redux";
 import { addFavorite, removeFavorite } from "../store/redux/favoriteSlice";
+import { rateMeal } from "../store/redux/ratingsSlice";
 // import { useFavoriate } from "../store/context/favorites-context";
 function MealDetailsScreen({ route, navigation }) {
   // const favoriateMealCtx = useFavoriate();
@@ -17,8 +19,13 @@ function MealDetailsScreen({ route, navigation }) {
   const faviorateMealIds = useSelector((state) => state.faviorate.ids);
 
   const mealIsFavorite = faviorateMealIds.includes(mealId);
+  const mealRating = useSelector((state) => state.ratings.mealRatings[mealId]?.rating || 0);
 
   const dispatch = useDispatch();
+
+  function handleRating(rating) {
+    dispatch(rateMeal({ mealId, rating }));
+  }
 
   function changeFavoriteStatusHandler() {
     if (mealIsFavorite) {
@@ -50,6 +57,9 @@ function MealDetailsScreen({ route, navigation }) {
         style={styles.image}
       />
       <Text style={styles.title}>{selectedMeal.title}</Text>
+      <View style={styles.ratingContainer}>
+        <RatingStars rating={mealRating} onRate={handleRating} />
+      </View>
       <MealDetails
         duration={selectedMeal.duration}
         complexity={selectedMeal.complexity}
@@ -73,6 +83,10 @@ export default MealDetailsScreen;
 const styles = StyleSheet.create({
   rootContainer: {
     marginBottom: 32,
+  },
+  ratingContainer: {
+    alignItems: 'center',
+    marginVertical: 8,
   },
   image: {
     width: "100%",
